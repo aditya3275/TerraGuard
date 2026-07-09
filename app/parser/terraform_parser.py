@@ -1,5 +1,8 @@
 from app.models import (
     CloudProvider,
+    Configuration,
+    ConfigurationResource,
+    Expression,
     InfraBlueprint,
     Metadata,
     OutputChange,
@@ -22,20 +25,33 @@ class TerraformParser(IaCParser):
 
         metadata = self._build_metadata(terraform_json)
 
+        configuration = self._build_configuration(terraform_json)
+
         resource_changes = self._build_resource_changes(terraform_json)
 
         outputs = self._build_outputs(terraform_json)
 
         return InfraBlueprint(
             metadata=metadata,
+            configuration=configuration,
             resource_changes=resource_changes,
             outputs=outputs,
         )
 
-    def _build_metadata(self, terraform_json: dict) -> Metadata:
+    def _build_metadata(
+        self,
+        terraform_json: dict,
+    ) -> Metadata:
+
         return Metadata(
-            terraform_version=terraform_json.get("terraform_version", ""),
-            format_version=terraform_json.get("format_version", ""),
+            terraform_version=terraform_json.get(
+                "terraform_version",
+                "",
+            ),
+            format_version=terraform_json.get(
+                "format_version",
+                "",
+            ),
             applyable=terraform_json.get(
                 "applyable",
                 False,
@@ -50,6 +66,47 @@ class TerraformParser(IaCParser):
             ),
         )
 
+    def _build_configuration(
+        self,
+        terraform_json: dict,
+    ) -> Configuration:
+
+        root_module = terraform_json.get("configuration", {}).get("root_module", {})
+
+        configuration_resources = []
+
+        for resource in root_module.get(
+            "resources",
+            [],
+        ):
+
+            expressions = {}
+
+            for expression_name, expression in resource.get(
+                "expressions",
+                {},
+            ).items():
+
+                expressions[expression_name] = Expression(
+                    references=expression.get(
+                        "references",
+                        [],
+                    )
+                )
+
+            configuration_resources.append(
+                ConfigurationResource(
+                    address=resource["address"],
+                    resource_type=resource["type"],
+                    resource_name=resource["name"],
+                    expressions=expressions,
+                )
+            )
+
+        return Configuration(
+            resources=configuration_resources,
+        )
+
     def _build_resource_changes(
         self,
         terraform_json: dict,
@@ -62,7 +119,12 @@ class TerraformParser(IaCParser):
             [],
         ):
 
-            provider = self._detect_provider(resource.get("provider_name", ""))
+            provider = self._detect_provider(
+                resource.get(
+                    "provider_name",
+                    "",
+                )
+            )
 
             actions = self._convert_actions(resource["change"]["actions"])
 
@@ -94,6 +156,7 @@ class TerraformParser(IaCParser):
         )
 
         for name, value in output_changes.items():
+
             outputs.append(
                 OutputChange(
                     name=name,

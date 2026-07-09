@@ -18,7 +18,13 @@ class ResourceAction(str, Enum):
 
 class RelationshipType(str, Enum):
     DEPENDS_ON = "depends_on"
+
+    REFERENCES = "references"
+
     ATTACHED_TO = "attached_to"
+
     ROUTES_TO = "routes_to"
+
     ASSUMES_ROLE = "assumes_role"
+
     CONNECTED_TO = "connected_to"
