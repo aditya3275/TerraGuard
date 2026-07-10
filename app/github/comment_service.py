@@ -1,11 +1,12 @@
 from github.GithubException import GithubException
 
 from app.github.client import GitHubClient
+from app.github.markdown import GitHubMarkdownRenderer
 
 
 class GitHubCommentService:
     """
-    Posts comments to GitHub Pull Requests.
+    Creates or updates TerraGuard Pull Request comments.
     """
 
     def __init__(self):
@@ -26,16 +27,28 @@ class GitHubCommentService:
 
             pr = repo.get_pull(pull_request)
 
+            marker = GitHubMarkdownRenderer.REPORT_MARKER
+
+            # Look for an existing TerraGuard comment
+            for comment in pr.get_issue_comments():
+
+                if marker in comment.body:
+
+                    comment.edit(body)
+
+                    print()
+                    print("Updated existing TerraGuard comment.")
+
+                    return
+
+            # No existing comment found.
             pr.create_issue_comment(body)
 
             print()
-
-            print("Comment posted successfully.")
+            print("Created new TerraGuard comment.")
 
         except GithubException as error:
 
             print()
-
             print("GitHub API Error")
-
             print(error)
