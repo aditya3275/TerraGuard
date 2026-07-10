@@ -235,6 +235,10 @@ TerraGuard is built around a few core principles:
 
 ---
 
+## Development
+
+This Branch is used to validate TerraGuard's GitHub Pull Request integration.
+
 ## License
 
 This project is licensed under the MIT License.
