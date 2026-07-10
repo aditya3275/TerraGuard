@@ -1,8 +1,9 @@
 from app.engine.terraguard_engine import (
     TerraGuardEngine,
 )
-from app.renderers.resource_risk_renderer import (
-    ResourceRiskRenderer,
+
+from app.github.markdown import (
+    GitHubMarkdownRenderer,
 )
 
 
@@ -13,32 +14,21 @@ def main():
         plan_json_path="terraform_examples/basic_vpc/plan.json",
     )
 
-    print()
+    markdown = GitHubMarkdownRenderer().render(report)
 
-    print(ResourceRiskRenderer().render(report.risk_report))
+    with open(
+        "report.md",
+        "w",
+        encoding="utf-8",
+    ) as file:
 
-    print()
-
-    print("Decision")
-    print("--------")
-
-    print(report.decision.decision.value)
-
-    print()
-
-    print("Reasons")
-    print("-------")
-
-    for reason in report.decision.reasons:
-        print(f"• {reason}")
+        file.write(markdown)
 
     print()
 
-    print("Recommendations")
-    print("---------------")
+    print("GitHub report generated successfully.")
 
-    for recommendation in report.decision.recommendations:
-        print(f"• {recommendation}")
+    print("Output file : report.md")
 
 
 if __name__ == "__main__":
