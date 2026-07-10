@@ -10,6 +10,10 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      pull-requests: write
+
     steps:
 
       - name: Checkout Repository
@@ -26,5 +30,10 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run TerraGuard
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_OWNER: ${{ github.repository_owner }}
+          GITHUB_REPOSITORY_NAME: ${{ github.event.repository.name }}
+          GITHUB_PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          python -m app.main
+          python -m app.github_action
