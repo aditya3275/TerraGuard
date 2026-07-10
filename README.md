@@ -237,7 +237,7 @@ TerraGuard is built around a few core principles:
 
 ## Development
 
-This branch is used to validate TerraGuard's GitHub Pull Request integration .
+This Branch is used to validate TerraGuard's GitHub Pull Request integration.
 
 ## License
 
