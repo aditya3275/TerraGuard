@@ -2,9 +2,19 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
-
-# Virtual Environment
 .venv/
+.ruff_cache/
+.mypy_cache/
+
+# Environment
+.env
+
+# Local reports
+report.md
+
+# Temporary scripts
+github_test.py
+github_comment_test.py
 
 # Terraform
 .terraform/
@@ -22,9 +32,3 @@ tfplan
 # Coverage
 .coverage
 htmlcov/
-
-# Ruff
-.ruff_cache/
-
-# Mypy
-.mypy_cache/
